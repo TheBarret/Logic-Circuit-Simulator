@@ -28,19 +28,14 @@ Public Class Wire
             n.Open = True
         Next
     End Sub
-    Public Sub Render(gfx As Graphics)
-        If (Me.Nodes.Any) Then
-            Dim points() As Point = Me.GetPath, lp As Point = points.First
-            For i As Integer = 1 To points.Count - 1
-                If (i <= 1) Then
-                    gfx.DrawLine(New Pen(Brushes.Gray, 2), lp, points(i))
-                ElseIf (i >= points.Count - 1) Then
-                    gfx.DrawLine(New Pen(Brushes.Gray, 2), lp, points(i))
-                Else
-                    gfx.DrawLine(New Pen(Me.Color, 2), lp, points(i))
-                End If
-                lp = points(i)
-            Next
+    Public Sub Draw(gfx As Graphics)
+        Dim points() As Point = Me.Nodes.Select(Function(n) n.Center).ToArray
+        If (Me.Nodes.Any AndAlso Me.Nodes.Count >= 4) Then
+            gfx.DrawLines(New Pen(Brushes.Silver, 2), points.Take(2).ToArray)
+            gfx.DrawLines(New Pen(Me.Transmitter.WireColor, 2), points.Skip(1).Take(points.Count - 2).ToArray)
+            gfx.DrawLines(New Pen(Brushes.Silver, 2), points.Skip(points.Count - 2).Take(2).ToArray)
+        ElseIf (Me.Nodes.Any AndAlso Me.Nodes.Count <= 3) Then
+            gfx.DrawLines(New Pen(Me.Transmitter.WireColor, 2), points.ToArray)
         End If
     End Sub
     Public ReadOnly Property GetPath As Point()
